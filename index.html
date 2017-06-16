@@ -89,7 +89,7 @@
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="杨文龙的博客">
-<meta property="og:url" content="http://techyang.cn/index.html">
+<meta property="og:url" content="http://techyang.me/index.html">
 <meta property="og:site_name" content="杨文龙的博客">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="杨文龙的博客">
@@ -120,7 +120,7 @@
 
 
 
-  <link rel="canonical" href="http://techyang.cn/"/>
+  <link rel="canonical" href="http://techyang.me/"/>
 
 
 
@@ -277,7 +277,308 @@
   
 
   <article class="post post-type-java " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://techyang.cn/2017/06/11/plantuml/">
+    <link itemprop="mainEntityOfPage" href="http://techyang.me/2017/06/16/state-machine/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="techyang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/logo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杨文龙的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/06/16/state-machine/" itemprop="url">
+                  JAVA状态机
+                </a>
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-16T21:02:23+08:00">
+                2017-06-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/design/" itemprop="url" rel="index">
+                    <span itemprop="name">design</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h2 id="1-引子"><a href="#1-引子" class="headerlink" title="1. 引子"></a>1. 引子</h2><p>空调(air-condition)的遥控器有两个按钮(更多的按钮奋斗在后面的例子中引入)，power/电源键和cool/制冷键。空调的运行呈现3个状态，停止/Off、仅送风/FanOnly、制冷/Cool。起始状态为Off，状态变化图如下所示。<br>这是简化的有限状态机(Finite State Machine、FSM或者Finite State Automata)图形，使用了状态图的3个元素：①气泡，表示状态(state)；②连接状态的箭头表示转换（transition）；③箭头上的标记前者为事件(event)。</p>
+<p>状态的转换，看图说话。按power键，则Off→FanOnly、Cool→Off等；按cool，则Off→Off (没有画出来，喜欢全面一点就自己画吧)。<br>对于这种简单的状态的转换，yqj2065还是喜欢分支语句。微笑，简洁明快。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div></pre></td><td class="code"><pre><div class="line">package property.state.stateMachine;  </div><div class="line">import static tool.Print.*;//pln  </div><div class="line">/** </div><div class="line"> * 空调Aircon。简单的模型： </div><div class="line"> * 遥控器有两个按钮(更多的按钮在下面的例子中引入)，power电源键和cool制冷键。 </div><div class="line"> * 空调的运行呈现3个状态，停止/Off、仅送风/FanOnly、制冷/Cool。 </div><div class="line"> * 起始状态为Off </div><div class="line"> * @author (yqj2065)  </div><div class="line"> * @version 0.1 </div><div class="line"> */  </div><div class="line">public class Aircon0&#123;  </div><div class="line">    // off，FanOnly，AC  </div><div class="line">    private int state=0;//起始状态为Off  </div><div class="line">    public int getState()&#123;return state;&#125;  </div><div class="line">    //两个Action  </div><div class="line">    public void power()&#123;//按power键  </div><div class="line">        if(state==0)&#123;//off  </div><div class="line">            state=1;  </div><div class="line">            pln(&quot;start Fan&quot;);   </div><div class="line">        &#125;else if(state==1)&#123;//FanOnly  </div><div class="line">            state=0;  </div><div class="line">            pln(&quot;stop Fan&quot;);   </div><div class="line">        &#125;else&#123;  </div><div class="line">            state=0;  </div><div class="line">            pln(&quot;stop Cool&quot;);   </div><div class="line">        &#125;  </div><div class="line">    &#125;  </div><div class="line">  </div><div class="line">    public void cool()&#123;//按制冷键  </div><div class="line">        if(state==0)&#123;//off  </div><div class="line">            pln(&quot;nothing&quot;);  </div><div class="line">        &#125;else if(state==1)&#123;//FanOnly  </div><div class="line">            state=2;  </div><div class="line">            pln(&quot;start Cool&quot;);   </div><div class="line">        &#125;else&#123;  </div><div class="line">            state=1;  </div><div class="line">            pln(&quot;stop Cool&quot;);   </div><div class="line">        &#125;  </div><div class="line">    &#125;  </div><div class="line">&#125;  </div><div class="line">package property.state.stateMachine;  </div><div class="line">public class ACCtrl&#123;  </div><div class="line">    public static void test()&#123;  </div><div class="line">        Aircon0 ac = new Aircon0();//power() cool()  </div><div class="line">        System.out.println(&quot;Current State:&quot; + ac.getState());  </div><div class="line">        ac.cool();  </div><div class="line">        ac.power();  </div><div class="line">        ac.cool();  </div><div class="line">        ac.cool();  </div><div class="line">        ac.power();  </div><div class="line">        ac.power();  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>测试代码的输出：<br>Current State:0<br>nothing<br>start Fan<br>start Cool<br>stop Cool<br>stop Fan<br>start Fan<br>在此基础上，可以花10分钟练习一下，采用状态模式修改上述代码。我们使用enum编写状态类层次。其结构如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">例程 4 6 enum State  </div><div class="line">  </div><div class="line">enum State0&#123;  </div><div class="line">    OFF&#123;  </div><div class="line">        @Override void power()&#123;              </div><div class="line">        &#125;  </div><div class="line">        @Override void power()&#123;  </div><div class="line">        &#125;  </div><div class="line">    &#125;,FANONLY&#123;  </div><div class="line">    &#125;,  </div><div class="line">    COOL&#123; &#125;;  </div><div class="line">    public abstract void power();  </div><div class="line">    public abstract void cool();  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>(本来是应该将State1作为Aircon1的内部类的。放在外边，power()等需要添加参数Aircon1，变为power(Aircon1 ac)).<br>现在，丰富有限状态机的细节，增添④动作(action)，如事件(event)相应的动作和状态的动作。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"></div></pre></td></tr></table></figure>
+<p>为此，在enum State1中，除了状态模式 提取的接口外，添加了状态机的各种动作/action methode<br>    void entry(Aircon1 ac){pln(“→”+ac.state.name());}<br>    void exit(Aircon1 ac){p(ac.state.name()+”→ “);}<br>    void startCool(){        p(“start Cool”);    }<br>    void stopCool(){        p(“stop Cool”);    }<br>    void startFan(){        p(“start Fan”);    }<br>    void stopFan(){        p(“stop Fan”);    }<br>每个power(Aircon1 ac)、cool(Aircon1 ac)的方法体结构都是：<br>            this.exit(ac);<br>            //如果有的话，事件(event)相应的动作，如stopFan();<br>            ac.state =OFF; //下一个状态<br>            ac.state.entry(ac);<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div></pre></td><td class="code"><pre><div class="line">package property.state.stateMachine;  </div><div class="line">import static tool.Print.*;//pln  </div><div class="line">/** </div><div class="line"> * 本来是应该将State1作为Aircon1的内部类的。现在放在外边， </div><div class="line"> * power()等需要变为power(Aircon1 ac) </div><div class="line"> */  </div><div class="line">public enum State1&#123;  </div><div class="line">    OFF&#123;  </div><div class="line">        @Override void exit(Aircon1 ac)&#123;super.exit(ac);startFan();&#125;  </div><div class="line">        @Override void power(Aircon1 ac)&#123;  </div><div class="line">            this.exit(ac);  </div><div class="line">            ac.state =FANONLY;              </div><div class="line">            ac.state.entry(ac);   </div><div class="line">        &#125;  </div><div class="line">        @Override void cool(Aircon1 ac)&#123;  </div><div class="line">            pln(&quot;nothing&quot;);  </div><div class="line">        &#125;  </div><div class="line">    &#125;,FANONLY&#123;  </div><div class="line">        @Override void power(Aircon1 ac)&#123;  </div><div class="line">            this.exit(ac);  </div><div class="line">            stopFan();  </div><div class="line">            ac.state =OFF;  </div><div class="line">            ac.state.entry(ac);   </div><div class="line">        &#125;  </div><div class="line">        @Override void cool(Aircon1 ac)&#123;  </div><div class="line">            this.exit(ac);  </div><div class="line">            ac.state =COOL;  </div><div class="line">            ac.state.entry(ac);  </div><div class="line">        &#125;  </div><div class="line">    &#125;,  </div><div class="line">    COOL&#123;  </div><div class="line">        @Override void exit(Aircon1 ac)&#123;super.exit(ac);stopCool();&#125;  </div><div class="line">        @Override void entry(Aircon1 ac)&#123;startCool();super.entry(ac);&#125;  </div><div class="line">        @Override void power(Aircon1 ac)&#123;              </div><div class="line">            this.exit(ac);  </div><div class="line">            stopFan();  </div><div class="line">            ac.state =OFF;  </div><div class="line">            ac.state.entry(ac);   </div><div class="line">        &#125;  </div><div class="line">        @Override void cool(Aircon1 ac)&#123;  </div><div class="line">            this.exit(ac);  </div><div class="line">            ac.state =FANONLY;  </div><div class="line">            ac.state.entry(ac);    </div><div class="line">        &#125;  </div><div class="line">    &#125;;  </div><div class="line">    //状态模式 提取的接口  </div><div class="line">    abstract void power(Aircon1 ac);  </div><div class="line">    abstract void cool(Aircon1 ac);  </div><div class="line">    //状态机的各种动作action methode  </div><div class="line">    void entry(Aircon1 ac)&#123;pln(&quot;→&quot;+ac.state.name());&#125;  </div><div class="line">    void exit(Aircon1 ac)&#123;p(ac.state.name()+&quot;→ &quot;);&#125;  </div><div class="line">    void startCool()&#123;        p(&quot;start Cool&quot;);    &#125;  </div><div class="line">    void stopCool()&#123;        p(&quot;stop Cool&quot;);    &#125;  </div><div class="line">    void startFan()&#123;        p(&quot;start Fan&quot;);    &#125;  </div><div class="line">    void stopFan()&#123;        p(&quot;stop Fan&quot;);    &#125;      </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/06/16/state-machine/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-java " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://techyang.me/2017/06/11/tools/devtools/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="techyang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/logo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杨文龙的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/06/11/tools/devtools/" itemprop="url">
+                  plantuml
+                </a>
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-11T21:13:35+08:00">
+                2017-06-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/design/" itemprop="url" rel="index">
+                    <span itemprop="name">design</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>本文给出了适用PlantUML的示例。<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/06/11/tools/devtools/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-java " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://techyang.me/2017/06/11/plantuml/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="techyang">
@@ -424,7 +725,7 @@
   
 
   <article class="post post-type-database " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://techyang.cn/2017/06/08/first-article/">
+    <link itemprop="mainEntityOfPage" href="http://techyang.me/2017/06/08/first-article/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="techyang">
@@ -566,7 +867,7 @@
   
 
   <article class="post post-type-java " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://techyang.cn/2017/06/08/hello-world/">
+    <link itemprop="mainEntityOfPage" href="http://techyang.me/2017/06/08/hello-world/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="techyang">
@@ -753,7 +1054,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-count">5</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -775,7 +1076,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-count">7</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
