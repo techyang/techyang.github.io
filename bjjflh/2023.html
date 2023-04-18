@@ -67,13 +67,22 @@
     data: ['4.14', '4.15', '4.16', '4.17', '4.18', '4.19', '4.20', '4.21', '4.22' ]
   },
   yAxis: {
+    scale:true,
     type: 'value'
   },
   series: [
     {
       name: '1-1000',
       type: 'line',
-
+      name: '5001-6000',
+      type: 'line',
+      label: {
+        show: true,
+        position: 'top',
+        textStyle: {
+          fontSize: 20
+        }
+      },
       data: [109.88, 110.96, 111.05, 111.13,111.38 ]
     },
     {
@@ -103,7 +112,13 @@
 	 {
       name: '5001-6000',
       type: 'line',
-
+      label: {
+        show: true,
+        position: 'bottom',
+        textStyle: {
+          fontSize: 20
+        }
+      },
       data: [36.71, 98.3, 100.13, 101.04,105.29 ]
     }
   ]
